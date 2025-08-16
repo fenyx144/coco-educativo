@@ -1,0 +1,11 @@
+{
+    "name": "coco-educativo",
+    "version": "1.0.0",
+    "description": "Plataforma educativa de matemáticas",
+    "main": "index.html",
+    "scripts": {
+      "start": "open index.html"
+    },
+    "keywords": ["educación", "matemáticas", "react"],
+    "author": "Tu nombre"
+  }

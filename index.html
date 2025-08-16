@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coco - Educativo | Aprende Matemáticas Paso a Paso</title>
+    <meta name="description" content="Plataforma educativa interactiva para aprender matemáticas con Coco, tu compañero de aprendizaje.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+    
+    <!-- React y librerías -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+        const { ChevronRight, ChevronLeft, CheckCircle, Brain, Calculator, TrendingUp, Star, Trophy, Book, Target } = lucide;
+
+        const CocoEducativo = () => {
+          const [currentLesson, setCurrentLesson] = useState(0);
+          const [currentStep, setCurrentStep] = useState(0);
+          const [userAnswer, setUserAnswer] = useState('');
+          const [showFeedback, setShowFeedback] = useState(false);
+          const [completedSteps, setCompletedSteps] = useState(new Set());
+          const [score, setScore] = useState(0);
+
+          const lessons = [
+            {
+              title: "Aritmética Básica",
+              icon: React.createElement(Calculator, { className: "w-6 h-6" }),
+              color: "from-blue-500 to-purple-600",
+              steps: [
+                {
+                  type: "theory",
+                  title: "¿Qué es la suma?",
+                  content: "La suma es una operación matemática que nos permite combinar cantidades. Cuando sumamos 3 + 2, estamos juntando 3 elementos con 2 elementos más.",
+                  example: "3 🍎 + 2 🍎 = 5 🍎"
+                },
+                {
+                  type: "example",
+                  title: "Ejemplo paso a paso",
+                  content: "Resolvamos: 15 + 23",
+                  steps: [
+                    "Alineamos los números por posición:",
+                    "  15",
+                    "+ 23",
+                    "____",
+                    "Sumamos unidades: 5 + 3 = 8",
+                    "Sumamos decenas: 1 + 2 = 3",
+                    "Resultado: 38"
+                  ]
+                },
+                {
+                  type: "exercise",
+                  title: "¡Tu turno!",
+                  question: "¿Cuánto es 17 + 25?",
+                  answer: "42",
+                  hint: "Suma primero las unidades (7+5) y luego las decenas (1+2)"
+                }
+              ]
+            },
+            {
+              title: "Álgebra",
+              icon: React.createElement(Brain, { className: "w-6 h-6" }),
+              color: "from-green-500 to-teal-600",
+              steps: [
+                {
+                  type: "theory",
+                  title: "Variables en Álgebra",
+                  content: "Una variable es una letra que representa un número desconocido. Comúnmente usamos 'x' o 'y'. Por ejemplo, si x = 5, entonces x + 3 = 8.",
+                  example: "Si x = 4, entonces x + 6 = 10"
+                },
+                {
+                  type: "exercise",
+                  title: "Encuentra el valor",
+                  question: "Si x + 7 = 12, ¿cuál es el valor de x?",
+                  answer: "5",
+                  hint: "¿Qué número sumado a 7 nos da 12?"
+                },
+                {
+                  type: "theory",
+                  title: "¿Qué son los Polinomios?",
+                  content: "Un polinomio es una expresión algebraica que consta de variables y coeficientes, que involucra solo las operaciones de suma, resta, multiplicación y exponentes enteros no negativos.",
+                  example: "P(x) = 3x² + 2x - 5 (polinomio de grado 2)"
+                },
+                {
+                  type: "example",
+                  title: "Suma de Polinomios",
+                  content: "Para sumar polinomios, agrupamos términos semejantes:",
+                  steps: [
+                    "P(x) = 2x² + 3x + 1",
+                    "Q(x) = x² - x + 4",
+                    "P(x) + Q(x) = (2x² + x²) + (3x - x) + (1 + 4)",
+                    "P(x) + Q(x) = 3x² + 2x + 5"
+                  ]
+                },
+                {
+                  type: "exercise",
+                  title: "Suma estos polinomios",
+                  question: "(x² + 2x + 3) + (2x² - x + 1) = ?",
+                  answer: "3x² + x + 4",
+                  hint: "Agrupa términos con la misma potencia de x"
+                },
+                {
+                  type: "theory",
+                  title: "La Regla de Ruffini",
+                  content: "La regla de Ruffini es un método para dividir un polinomio por un binomio de la forma (x - a). Es más rápido que la división larga de polinomios.",
+                  example: "Para dividir P(x) ÷ (x - 2), usamos a = 2"
+                },
+                {
+                  type: "example",
+                  title: "Ejemplo: Dividir x³ - 6x² + 11x - 6 ÷ (x - 1)",
+                  content: "Aplicamos Ruffini con a = 1:",
+                  steps: [
+                    "Coeficientes: 1  -6  11  -6",
+                    "       1 |  1  -6  11  -6",
+                    "         |     1  -5   6",
+                    "         |  1  -5   6   0",
+                    "",
+                    "Resultado: x² - 5x + 6",
+                    "Resto: 0"
+                  ]
+                },
+                {
+                  type: "exercise",
+                  title: "División por Ruffini",
+                  question: "Al dividir x² - 3x + 2 ÷ (x - 1), ¿cuál es el resto?",
+                  answer: "0",
+                  hint: "Usa Ruffini con a = 1. Si el resto es 0, significa que (x-1) es un factor."
+                },
+                {
+                  type: "theory",
+                  title: "Ecuaciones Cuadráticas",
+                  content: "Una ecuación cuadrática tiene la forma ax² + bx + c = 0, donde a ≠ 0. Podemos resolverla usando la fórmula cuadrática:",
+                  example: "x = (-b ± √(b² - 4ac)) / 2a"
+                },
+                {
+                  type: "example",
+                  title: "Resolver: x² - 5x + 6 = 0",
+                  content: "Aplicamos la fórmula cuadrática:",
+                  steps: [
+                    "a = 1, b = -5, c = 6",
+                    "Discriminante: Δ = b² - 4ac = 25 - 24 = 1",
+                    "x = (5 ± √1) / 2 = (5 ± 1) / 2",
+                    "x₁ = (5 + 1) / 2 = 3",
+                    "x₂ = (5 - 1) / 2 = 2",
+                    "Soluciones: x = 2 y x = 3"
+                  ]
+                },
+                {
+                  type: "exercise",
+                  title: "Resuelve la ecuación",
+                  question: "¿Cuáles son las soluciones de x² - 4x + 3 = 0? (escribe la menor)",
+                  answer: "1",
+                  hint: "Usa la fórmula cuadrática o factoriza (x - 1)(x - 3) = 0"
+                }
+              ]
+            },
+            {
+              title: "Razonamiento Lógico",
+              icon: React.createElement(TrendingUp, { className: "w-6 h-6" }),
+              color: "from-orange-500 to-red-600",
+              steps: [
+                {
+                  type: "theory",
+                  title: "Patrones Numéricos",
+                  content: "Los patrones son secuencias que siguen una regla. Por ejemplo: 2, 4, 6, 8... cada número aumenta en 2.",
+                  example: "Patrón: 5, 10, 15, 20... (aumenta de 5 en 5)"
+                },
+                {
+                  type: "exercise",
+                  title: "Completa el patrón",
+                  question: "3, 6, 9, 12, ___",
+                  answer: "15",
+                  hint: "Cada número aumenta en 3"
+                }
+              ]
+            }
+          ];
+
+          const currentLessonData = lessons[currentLesson];
+          const currentStepData = currentLessonData.steps[currentStep];
+
+          const handleAnswer = () => {
+            if (currentStepData.type === 'exercise') {
+              const isCorrect = userAnswer.trim().toLowerCase() === currentStepData.answer.toLowerCase();
+              setShowFeedback(true);
+              
+              if (isCorrect) {
+                setScore(score + 10);
+                setCompletedSteps(prev => new Set([...prev, `${currentLesson}-${currentStep}`]));
+              }
+            }
+          };
+
+          const nextStep = () => {
+            if (currentStep < currentLessonData.steps.length - 1) {
+              setCurrentStep(currentStep + 1);
+            } else if (currentLesson < lessons.length - 1) {
+              setCurrentLesson(currentLesson + 1);
+              setCurrentStep(0);
+            }
+            setUserAnswer('');
+            setShowFeedback(false);
+          };
+
+          const prevStep = () => {
+            if (currentStep > 0) {
+              setCurrentStep(currentStep - 1);
+            } else if (currentLesson > 0) {
+              setCurrentLesson(currentLesson - 1);
+              setCurrentStep(lessons[currentLesson - 1].steps.length - 1);
+            }
+            setUserAnswer('');
+            setShowFeedback(false);
+          };
+
+          const isStepCompleted = completedSteps.has(`${currentLesson}-${currentStep}`);
+
+          return React.createElement("div", { className: "min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-indigo-100" },
+            React.createElement("header", { className: "bg-white shadow-lg border-b-4 border-gradient-to-r from-purple-500 to-blue-500" },
+              React.createElement("div", { className: "container mx-auto px-6 py-4" },
+                React.createElement("div", { className: "flex items-center justify-between" },
+                  React.createElement("div", { className: "flex items-center space-x-3" },
+                    React.createElement("div", { className: "bg-gradient-to-r from-purple-500 to-blue-500 p-2 rounded-full" },
+                      React.createElement(Book, { className: "w-8 h-8 text-white" })
+                    ),
+                    React.createElement("div", null,
+                      React.createElement("h1", { className: "text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent" }, "Coco - Educativo"),
+                      React.createElement("p", { className: "text-gray-600 text-sm" }, "Tu compañero de matemáticas")
+                    )
+                  ),
+                  React.createElement("div", { className: "flex items-center space-x-6" },
+                    React.createElement("div", { className: "flex items-center space-x-2 bg-yellow-100 px-4 py-2 rounded-full" },
+                      React.createElement(Star, { className: "w-5 h-5 text-yellow-500" }),
+                      React.createElement("span", { className: "font-bold text-yellow-700" }, `${score} puntos`)
+                    ),
+                    React.createElement("div", { className: "relative" },
+                      React.createElement("div", { className: "bg-white p-3 rounded-full shadow-lg transform hover:scale-110 transition-transform duration-200 border-4 border-gray-800" },
+                        React.createElement("svg", { width: "48", height: "48", viewBox: "0 0 48 48", fill: "none", xmlns: "http://www.w3.org/2000/svg" },
+                          React.createElement("circle", { cx: "24", cy: "28", r: "16", fill: "white", stroke: "black", strokeWidth: "2" }),
+                          React.createElement("circle", { cx: "19", cy: "23", r: "2", fill: "black" }),
+                          React.createElement("circle", { cx: "29", cy: "23", r: "2", fill: "black" }),
+                          React.createElement("path", { d: "M19 31 Q24 36 29 31", stroke: "black", strokeWidth: "2", fill: "none", strokeLinecap: "round" }),
+                          React.createElement("circle", { cx: "18", cy: "15", r: "2", fill: "black" }),
+                          React.createElement("circle", { cx: "30", cy: "15", r: "2", fill: "black" }),
+                          React.createElement("circle", { cx: "8", cy: "28", r: "3", fill: "white", stroke: "black", strokeWidth: "2" }),
+                          React.createElement("circle", { cx: "40", cy: "28", r: "3", fill: "white", stroke: "black", strokeWidth: "2" }),
+                          React.createElement("circle", { cx: "18", cy: "42", r: "3", fill: "white", stroke: "black", strokeWidth: "2" }),
+                          React.createElement("circle", { cx: "30", cy: "42", r: "3", fill: "white", stroke: "black", strokeWidth: "2" })
+                        )
+                      ),
+                      React.createElement("div", { className: "absolute -top-2 -right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded-full font-bold animate-bounce" }, "¡Hola!")
+                    )
+                  )
+                )
+              )
+            ),
+            React.createElement("div", { className: "container mx-auto px-6 py-8" },
+              React.createElement("div", { className: "grid lg:grid-cols-4 gap-8" },
+                React.createElement("div", { className: "lg:col-span-1" },
+                  React.createElement("div", { className: "bg-white rounded-2xl shadow-xl p-6 sticky top-8" },
+                    React.createElement("h2", { className: "text-xl font-bold text-gray-800 mb-4 flex items-center" },
+                      React.createElement(Trophy, { className: "w-5 h-5 mr-2 text-yellow-500" }),
+                      "Lecciones"
+                    ),
+                    React.createElement("div", { className: "space-y-3" },
+                      lessons.map((lesson, index) =>
+                        React.createElement("button", {
+                          key: index,
+                          onClick: () => {setCurrentLesson(index); setCurrentStep(0);},
+                          className: `w-full p-4 rounded-xl text-left transition-all duration-200 transform hover:scale-105 ${
+                            currentLesson === index
+                              ? `bg-gradient-to-r ${lesson.color} text-white shadow-lg`
+                              : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
+                          }`
+                        },
+                          React.createElement("div", { className: "flex items-center space-x-3" },
+                            lesson.icon,
+                            React.createElement("div", null,
+                              React.createElement("h3", { className: "font-semibold" }, lesson.title),
+                              React.createElement("p", { className: "text-sm opacity-80" }, `${lesson.steps.length} paso${lesson.steps.length !== 1 ? 's' : ''}`)
+                            )
+                          )
+                        )
+                      )
+                    )
+                  )
+                ),
+                React.createElement("div", { className: "lg:col-span-3" },
+                  React.createElement("div", { className: "bg-white rounded-2xl shadow-xl overflow-hidden" },
+                    React.createElement("div", { className: "bg-gray-100 p-4" },
+                      React.createElement("div", { className: "flex items-center justify-between mb-2" },
+                        React.createElement("span", { className: "text-sm font-medium text-gray-600" }, `Progreso: Paso ${currentStep + 1} de ${currentLessonData.steps.length}`),
+                        React.createElement("span", { className: "text-sm font-medium text-gray-600" }, `${Math.round(((currentStep + 1) / currentLessonData.steps.length) * 100)}%`)
+                      ),
+                      React.createElement("div", { className: "bg-gray-200 rounded-full h-3" },
+                        React.createElement("div", {
+                          className: `bg-gradient-to-r ${currentLessonData.color} h-3 rounded-full transition-all duration-500`,
+                          style: { width: `${((currentStep + 1) / currentLessonData.steps.length) * 100}%` }
+                        })
+                      )
+                    ),
+                    React.createElement("div", { className: "p-8" },
+                      React.createElement("div", { className: "flex items-center space-x-3 mb-6" },
+                        React.createElement("div", { className: `bg-gradient-to-r ${currentLessonData.color} p-3 rounded-full` }, currentLessonData.icon),
+                        React.createElement("div", null,
+                          React.createElement("h2", { className: "text-2xl font-bold text-gray-800" }, currentStepData.title),
+                          React.createElement("p", { className: "text-gray-600" }, currentLessonData.title)
+                        ),
+                        isStepCompleted && React.createElement(CheckCircle, { className: "w-8 h-8 text-green-500 ml-auto" })
+                      ),
+                      
+                      currentStepData.type === 'theory' && React.createElement("div", { className: "space-y-6" },
+                        React.createElement("div", { className: "bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl border-l-4 border-blue-500" },
+                          React.createElement("p", { className: "text-lg text-gray-800 leading-relaxed" }, currentStepData.content)
+                        ),
+                        currentStepData.example && React.createElement("div", { className: "bg-green-50 p-6 rounded-xl border-l-4 border-green-500" },
+                          React.createElement("h4", { className: "font-bold text-green-800 mb-2" }, "Ejemplo:"),
+                          React.createElement("p", { className: "text-green-700 text-lg font-mono" }, currentStepData.example)
+                        )
+                      ),
+
+                      currentStepData.type === 'example' && React.createElement("div", { className: "space-y-4" },
+                        React.createElement("div", { className: "bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl" },
+                          React.createElement("p", { className: "text-lg text-gray-800 mb-4" }, currentStepData.content),
+                          React.createElement("div", { className: "bg-white p-4 rounded-lg font-mono text-center" },
+                            currentStepData.steps.map((step, index) =>
+                              React.createElement("div", { key: index, className: "text-gray-700 py-1" }, step)
+                            )
+                          )
+                        )
+                      ),
+
+                      currentStepData.type === 'exercise' && React.createElement("div", { className: "space-y-6" },
+                        React.createElement("div", { className: "bg-gradient-to-r from-orange-50 to-pink-50 p-6 rounded-xl border-l-4 border-orange-500" },
+                          React.createElement(Target, { className: "w-8 h-8 text-orange-500 mb-4" }),
+                          React.createElement("h3", { className: "text-xl font-bold text-gray-800 mb-3" }, currentStepData.question),
+                          React.createElement("div", { className: "flex space-x-4 items-center" },
+                            React.createElement("input", {
+                              type: "text",
+                              value: userAnswer,
+                              onChange: (e) => setUserAnswer(e.target.value),
+                              placeholder: "Tu respuesta...",
+                              className: "flex-1 p-3 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none text-lg",
+                              onKeyPress: (e) => e.key === 'Enter' && handleAnswer()
+                            }),
+                            React.createElement("button", {
+                              onClick: handleAnswer,
+                              className: "bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-lg font-bold hover:from-orange-600 hover:to-pink-600 transition-all duration-200 transform hover:scale-105"
+                            }, "Verificar")
+                          ),
+                          showFeedback && React.createElement("div", {
+                            className: `mt-4 p-4 rounded-lg ${
+                              userAnswer.trim().toLowerCase() === currentStepData.answer.toLowerCase()
+                                ? 'bg-green-100 text-green-800 border-l-4 border-green-500'
+                                : 'bg-red-100 text-red-800 border-l-4 border-red-500'
+                            }`
+                          },
+                            userAnswer.trim().toLowerCase() === currentStepData.answer.toLowerCase() ? 
+                              React.createElement("div", { className: "flex items-center" },
+                                React.createElement(CheckCircle, { className: "w-5 h-5 mr-2" }),
+                                "¡Correcto! Excelente trabajo."
+                              ) :
+                              React.createElement("div", null,
+                                React.createElement("p", { className: "font-bold" }, `Incorrecto. ${currentStepData.hint}`),
+                                React.createElement("p", { className: "mt-2" }, `La respuesta correcta es: `, React.createElement("strong", null, currentStepData.answer))
+                              )
+                          )
+                        )
+                      )
+                    ),
+                    React.createElement("div", { className: "bg-gray-50 p-6 flex justify-between items-center" },
+                      React.createElement("button", {
+                        onClick: prevStep,
+                        disabled: currentLesson === 0 && currentStep === 0,
+                        className: "flex items-center space-x-2 px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                      },
+                        React.createElement(ChevronLeft, { className: "w-5 h-5" }),
+                        React.createElement("span", null, "Anterior")
+                      ),
+                      React.createElement("div", { className: "flex space-x-2" },
+                        currentLessonData.steps.map((_, index) =>
+                          React.createElement("div", {
+                            key: index,
+                            className: `w-3 h-3 rounded-full ${
+                              index === currentStep
+                                ? `bg-gradient-to-r ${currentLessonData.color}`
+                                : index < currentStep
+                                ? 'bg-green-400'
+                                : 'bg-gray-300'
+                            }`
+                          })
+                        )
+                      ),
+                      React.createElement("button", {
+                        onClick: nextStep,
+                        disabled: currentLesson === lessons.length - 1 && currentStep === currentLessonData.steps.length - 1,
+                        className: `flex items-center space-x-2 px-6 py-3 bg-gradient-to-r ${currentLessonData.color} text-white rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105`
+                      },
+                        React.createElement("span", null, "Siguiente"),
+                        React.createElement(ChevronRight, { className: "w-5 h-5" })
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          );
+        };
+
+        ReactDOM.render(React.createElement(CocoEducativo), document.getElementById('root'));
+    </script>
+</body>
+</html>
